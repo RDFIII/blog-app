@@ -3,6 +3,7 @@ const app = express();
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const methodOverride = require("method-override");
+const expressSanitzier = require("express-sanitizer");
 
 // APP CONFIG
 mongoose.connect("mongodb://localhost/blog-app", { useMongoClient: true });
@@ -10,6 +11,7 @@ app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride("_method"));
+app.use(expressSanitzier());
 
 // MONGOOSE/MODEL CONFIG
 let blogSchema = new mongoose.Schema({
@@ -54,6 +56,7 @@ app.get("/blogs/new", function(req, res){
 
 // CREATE ROUTE
 app.post("/blogs", function(req, res){
+  req.body.blog.body = req.sanitize(req.body.blog.body);
   Blog.create(req.body.blog, function(err, newBlog){
     if(err){
       console.log(err);
@@ -102,6 +105,7 @@ app.put("/blogs/:id", function(req, res){
 
 // DESTROY ROUTE
 app.delete("/blogs/:id", function(req, res){
+  req.body.blog.body = req.sanitize(req.body.blog.body);
   Blog.findByIdAndRemove(req.params.id, function(err){
     if(err){
       console.log(err);
