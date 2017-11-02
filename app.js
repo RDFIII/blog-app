@@ -27,6 +27,8 @@ let Blog = mongoose.model("Blog", blogSchema);
 
 // RESTFUL ROUTES
 
+
+// ROOT ROUTE
 app.get("/", function(req, res){
   res.redirect("/blogs");
 });
@@ -55,6 +57,18 @@ app.post("/blogs", function(req, res){
       res.render("new");
     } else {
       res.redirect("/blogs");
+    };
+  });
+});
+
+// SHOW ROUTE
+app.get("/blogs/:id", function(req, res){
+  Blog.findById(req.params.id, function(err, foundBlog){
+    if(err){
+      console.log(err);
+      res.redirect("/blogs");
+    } else {
+      res.render("show", {blog: foundBlog});
     };
   });
 });
