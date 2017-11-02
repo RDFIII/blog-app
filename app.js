@@ -2,12 +2,14 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const methodOverride = require("method-override");
 
 // APP CONFIG
 mongoose.connect("mongodb://localhost/blog-app", { useMongoClient: true });
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(methodOverride("_method"));
 
 // MONGOOSE/MODEL CONFIG
 let blogSchema = new mongoose.Schema({
@@ -25,8 +27,9 @@ let Blog = mongoose.model("Blog", blogSchema);
 //   body: "Just got my new Larivee D03.  It is pretty dang sweet.  Got it on the cheap too!"
 // });
 
-// RESTFUL ROUTES
 
+
+// RESTFUL ROUTES
 
 // ROOT ROUTE
 app.get("/", function(req, res){
@@ -69,6 +72,42 @@ app.get("/blogs/:id", function(req, res){
       res.redirect("/blogs");
     } else {
       res.render("show", {blog: foundBlog});
+    };
+  });
+});
+
+// EDIT ROUTE
+app.get("/blogs/:id/edit", function(req, res){
+  Blog.findById(req.params.id, function(err, foundBlog){
+    if(err){
+      console.log(err);
+      res.redirect("/blogs");
+    } else {
+      res.render("edit", {blog: foundBlog});
+    };
+  });
+});
+
+// UPDATE ROUTE
+app.put("/blogs/:id", function(req, res){
+  Blog.findByIdAndUpdate(req.params.id, req.body.blog, function(err, updatedBlog){
+    if(err){
+      console.log(err);
+      res.redirect("/blogs");
+    } else {
+      res.redirect("/blogs/" + req.params.id);
+    };
+  });
+});
+
+// DESTROY ROUTE
+app.delete("/blogs/:id", function(req, res){
+  Blog.findByIdAndRemove(req.params.id, function(err){
+    if(err){
+      console.log(err);
+      res.redirect("/blogs");
+    } else {
+      res.redirect("/blogs");
     };
   });
 });
