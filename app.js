@@ -93,6 +93,7 @@ app.get("/blogs/:id/edit", function(req, res){
 
 // UPDATE ROUTE
 app.put("/blogs/:id", function(req, res){
+  req.body.blog.body = req.sanitize(req.body.blog.body);
   Blog.findByIdAndUpdate(req.params.id, req.body.blog, function(err, updatedBlog){
     if(err){
       console.log(err);
@@ -105,7 +106,6 @@ app.put("/blogs/:id", function(req, res){
 
 // DESTROY ROUTE
 app.delete("/blogs/:id", function(req, res){
-  req.body.blog.body = req.sanitize(req.body.blog.body);
   Blog.findByIdAndRemove(req.params.id, function(err){
     if(err){
       console.log(err);
